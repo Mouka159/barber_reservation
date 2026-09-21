@@ -1,0 +1,40 @@
+📑 Cahier des charges – Plateforme de réservation Barber & Coiffeuse
+1. Présentation du projet
+Nom : Barber & Coiffeuse Booking System
+Objectif : Permettre aux clients de réserver un service (coupe, barbe, coloration, tresses) en ligne, avec choix du coiffeur préféré et upload d’une photo du style souhaité.
+Public cible : Clients particuliers, salons de coiffure, barbershops.
+2. Fonctionnalités côté Client
+Création de compte : inscription avec nom, email/téléphone, mot de passe.
+Connexion : accès à son espace personnel.
+Choix du service : coupe homme/femme, barbe, coloration, tresses.
+Sélection du coiffeur préféré : choisir son barber/coiffeuse favori.
+Choix du créneau : date et heure disponibles.
+Upload photo du style : déposer une image de la coupe/tresse souhaitée.
+Validation de la réservation : confirmation de la demande.
+Ticket PDF : reçu avec infos, coiffeur choisi, photo du style, mention “Paiement sur place”.
+Notifications : email/SMS de confirmation et rappel avant rendez‑vous.
+3. Fonctionnalités côté Employés
+Gestion du planning : voir les réservations attribuées.
+Consultation des préférences : vérifier si le client a choisi un coiffeur préféré.
+Accès au style demandé : visualiser la photo uploadée par le client.
+Validation à l’accueil : scanner le QR code ou vérifier le numéro de réservation.
+Réalisation du service : effectuer la coupe/tresse selon la demande.
+Encaissement : paiement direct au salon.
+Mise à jour du statut : marquer la réservation comme “terminée”.
+4. Fonctionnalités côté Administrateur
+Gestion des employés : ajouter/supprimer coiffeurs, gérer leurs disponibilités.
+Gestion des services : définir prix, durée, type de prestation.
+Suivi des réservations : voir toutes les réservations en cours.
+Statistiques : nombre de clients, services les plus demandés, coiffeurs les plus sollicités.
+5. Architecture technique
+Front‑end : HTML, CSS/TailwindCSS, JavaScript
+Back‑end : PHP/MySQL.
+Hébergement : serveur Apache/Nginx.
+Sécurité : mots de passe hashés, HTTPS, validation des entrées.
+6. Planning
+Phase 1 : Conception (schéma BDD + maquettes).
+Phase 2 : Développement front‑end (interfaces).
+Phase 3 : Développement back‑end (logique + API).
+Phase 4 : Intégration front/back.
+Phase 5 : Tests et mise en ligne.
+======================================================

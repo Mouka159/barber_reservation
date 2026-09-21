@@ -1,0 +1,545 @@
+!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Page de Réservation & Générateur de Ticket PDF</title>
+    <meta name="description" content="Page de réservation alignée sur la table reservation : id_reservation, id_utilisateur, id_employe, date_reservation, heure_reservation, photo_du_style, ticket_en_pdf, date_de_creation.">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Page de Réservation & Générateur de Ticket PDF (Responsive)</title>
+    <meta name="description" content="Page de réservation responsive alignée sur la table reservation : id_reservation, id_utilisateur, id_employe, date_reservation, heure_reservation, photo_du_style, ticket_en_pdf, date_de_creation.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+        }
+        body {
+            font-family: var(--font-sans);
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            line-height: 1.5;
+            min-height: 100vh;
+            padding-bottom: 80px;
+            padding-bottom: 60px;
+        }
+        /* Top System Banner - Responsive */
+        .db-schema-banner {
+            background: linear-gradient(90deg, #1e1b4b, #065f46);
+            border-bottom: 1px solid #10b981;
+            padding: 10px 24px;
+            padding: 10px 20px;
+            font-size: 0.82rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: #a7f3d0;
+            font-family: var(--font-mono);
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .schema-badge {
+            background: #059669;
+            color: #fff;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-weight: 700;
+            margin-right: 8px;
+            margin-right: 6px;
+            display: inline-block;
+        }
+        /* Navbar - Responsive */
+        .navbar {
+            background: rgba(21, 28, 40, 0.9);
+            background: rgba(21, 28, 40, 0.92);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-bottom: 1px solid var(--border-color);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            padding: 16px 32px;
+            padding: 14px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        .brand-title {
+            font-size: 1.3rem;
+            font-size: 1.25rem;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+        }
+        .brand-title span {
+            color: var(--primary);
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 28px 24px;
+            padding: 24px 20px;
+        }
+        /* Database Column Mapping Panel */
+        .db-mapping-panel {
+            background: var(--bg-card);
+            border: 1px dashed var(--accent-blue);
+            border-radius: var(--radius-lg);
+            padding: 20px 24px;
+            margin-bottom: 32px;
+            padding: 18px 20px;
+            margin-bottom: 28px;
+        }
+        .db-mapping-panel h3 {
+            font-size: 0.95rem;
+            font-size: 0.9rem;
+            font-weight: 800;
+            color: var(--accent-blue);
+            font-family: var(--font-mono);
+            margin-bottom: 12px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .schema-tags-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            gap: 8px;
+        }
+        .schema-col-tag {
+            background: var(--bg-element);
+            border: 1px solid var(--border-color);
+            padding: 6px 12px;
+            padding: 5px 10px;
+            border-radius: 6px;
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+            font-size: 0.78rem;
+            color: #e2e8f0;
+        }
+        .schema-col-tag span {
+        .schema-col-tag code {
+            color: var(--primary);
+            font-weight: 700;
+        }
+        /* Layout Grid */
+        /* Layout Grid - Desktop & Mobile */
+        .layout-grid {
+            display: grid;
+            grid-template-columns: 1fr 420px;
+            gap: 28px;
+            grid-template-columns: 1fr 400px;
+            gap: 24px;
+            align-items: start;
+        }
+        @media (max-width: 960px) {
+        /* Responsive Breakpoint Layout Grid */
+        @media (max-width: 992px) {
+            .layout-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        /* Card Form Box */
+        .form-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-xl);
+            padding: 32px;
+            padding: 28px;
+        }
+        .form-section-title {
+            font-size: 1.25rem;
+            font-weight: 800;
+            margin-bottom: 6px;
+            margin-bottom: 4px;
+        }
+        .form-section-sub {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin-bottom: 24px;
+            font-size: 0.88rem;
+            margin-bottom: 20px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+            margin-bottom: 18px;
+        }
+        .form-label {
+            display: block;
+            font-size: 0.88rem;
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+            margin-bottom: 6px;
+        }
+        .form-label code {
+            color: var(--accent-blue);
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+            font-size: 0.78rem;
+            background: rgba(56, 189, 248, 0.1);
+            padding: 1px 5px;
+            border-radius: 4px;
+            margin-left: 6px;
+        }
+        /* Form Inputs Responsive - 16px font on mobile prevents iOS Safari zoom */
+        .form-input, .form-select {
+            width: 100%;
+            background: var(--bg-element);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 12px 16px;
+            padding: 12px 14px;
+            color: var(--text-main);
+            font-family: var(--font-sans);
+            font-size: 0.95rem;
+            font-size: 16px;
+            outline: none;
+            transition: border-color 0.2s;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+        .form-input:focus, .form-select:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.15);
+        }
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            gap: 14px;
+        }
+        @media (max-width: 600px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+        /* Photo Upload & Gallery Selection */
+        .style-photo-picker {
+            border: 2px dashed var(--border-color);
+            background: var(--bg-element);
+            border-radius: var(--radius-lg);
+            padding: 20px;
+            padding: 18px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+        }
+        .style-photo-picker:hover {
+        .style-photo-picker:hover, .style-photo-picker:active {
+            border-color: var(--primary);
+            background: var(--primary-light);
+        }
+        .photo-preview-box {
+            width: 100%;
+            height: 180px;
+            border-radius: var(--radius-md);
+            overflow: hidden;
+            margin-top: 12px;
+            display: none;
+            background: #000;
+        }
+        .photo-preview-box img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .sample-photos-row {
+            display: flex;
+            gap: 10px;
+            margin-top: 12px;
+            margin-top: 10px;
+            overflow-x: auto;
+            padding-bottom: 6px;
+            scroll-snap-type: x mandatory;
+            -webkit-overflow-scrolling: touch;
+        }
+        .sample-photo-thumb {
+            width: 70px;
+            height: 70px;
+            width: 72px;
+            height: 72px;
+            min-width: 72px;
+            border-radius: var(--radius-md);
+            border: 2px solid var(--border-color);
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.2s;
+            scroll-snap-align: start;
+        }
+        .sample-photo-thumb.selected {
+            border-color: var(--primary);
+            box-shadow: 0 0 10px rgba(245, 158, 11, 0.4);
+            box-shadow: 0 0 12px rgba(245, 158, 11, 0.4);
+        }
+        .sample-photo-thumb img {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-xl);
+            padding: 28px;
+            padding: 24px;
+            position: sticky;
+            top: 90px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            gap: 16px;
+        }
+        @media (max-width: 992px) {
+            .ticket-pass-card {
+                position: relative;
+                top: 0;
+            }
+        }
+        .ticket-header {
+            font-size: 1.1rem;
+            font-size: 1.05rem;
+            font-weight: 800;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 14px;
+            padding-bottom: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+        .ticket-code-tag {
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+            font-size: 0.82rem;
+            color: var(--primary);
+            font-weight: 800;
+            background: var(--primary-light);
+            padding: 4px 10px;
+            border-radius: 6px;
+        }
+        .ticket-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.9rem;
+            font-size: 0.88rem;
+            color: var(--text-muted);
+            gap: 12px;
+        }
+        .ticket-row strong {
+            color: var(--text-main);
+            text-align: right;
+            word-break: break-word;
+        }
+        .ticket-photo-thumb {
+            width: 100%;
+            height: 130px;
+            height: 140px;
+            border-radius: var(--radius-md);
+            overflow: hidden;
+            background: var(--bg-element);
+        .barcode-visual {
+            background: #fff;
+            padding: 12px;
+            padding: 10px;
+            border-radius: var(--radius-md);
+            text-align: center;
+        }
+        .barcode-lines {
+            height: 36px;
+            height: 32px;
+            background: repeating-linear-gradient(
+                90deg,
+                #000 0, #000 2px,
+            color: #000;
+            border: none;
+            border-radius: var(--radius-md);
+            padding: 16px;
+            font-size: 1.05rem;
+            padding: 15px 20px;
+            font-size: 1rem;
+            font-weight: 800;
+            cursor: pointer;
+            width: 100%;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            box-shadow: 0 4px 16px rgba(245, 158, 11, 0.3);
+            min-height: 48px;
+        }
+        .btn-primary:hover {
+            background: var(--primary-hover);
+        .btn-primary:active {
+            transform: scale(0.98);
+        }
+        .btn-download-pdf {
+            background: #059669;
+            color: #fff;
+            border: none;
+            border-radius: var(--radius-md);
+            padding: 14px;
+            font-size: 1rem;
+            padding: 14px 20px;
+            font-size: 0.95rem;
+            font-weight: 800;
+            cursor: pointer;
+            width: 100%;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            min-height: 48px;
+        }
+        .btn-download-pdf:hover {
+        .btn-download-pdf:active {
+            background: #047857;
+            transform: scale(0.98);
+        }
+        .hidden {
+            display: none !important;
+        }
+        /* Mobile specific media queries (< 480px) */
+        @media (max-width: 480px) {
+            .container {
+                padding: 16px 12px;
+            }
+            .form-card, .ticket-pass-card, .db-mapping-panel {
+                padding: 18px 14px;
+                border-radius: var(--radius-lg);
+            }
+            .brand-title {
+                font-size: 1.1rem;
+            }
+            .db-schema-banner {
+                font-size: 0.75rem;
+                padding: 8px 12px;
+            }
+            .navbar {
+                padding: 12px 14px;
+            }
+            .form-section-title {
+                font-size: 1.1rem;
+            }
+            .ticket-header {
+                font-size: 0.95rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    
+    <!-- Navbar -->
+    <!-- Navbar Responsive -->
+    <nav class="navbar">
+        <div class="brand-title">
+            ✂️ <span>L'ATELIER</span> - Système de Réservation
+            ✂️ <span>L'ATELIER</span> - Réservation
+        </div>
+        <div style="font-size: 0.85rem; color: var(--text-muted);">
+        <div style="font-size: 0.8rem; color: var(--text-muted); font-family: var(--font-mono);">
+            Table : <code>reservation</code>
+        </div>
+    </nav>
+    <div class="container">
+        <!-- Panel Mappage de la table reservation -->
+        <div class="db-mapping-panel">
+            <h3>🗄️ Structure de la Table `reservation` détectée :</h3>
+            <h3>🗄️ Colonnes de la Table `reservation` :</h3>
+            <div class="schema-tags-grid">
+                <div class="schema-col-tag"><code>id_reservation</code> : INT (PK)</div>
+                <div class="schema-col-tag"><code>id_utilisateur</code> : INT (FK)</div>
+            <!-- Formulaire de Réservation -->
+            <main class="form-card">
+                <div class="form-section-title">Formulaire de Réservation</div>
+                <div class="form-section-sub">Remplissez les champs ci-dessous pour enregistrer la réservation et générer votre ticket PDF.</div>
+                <div class="form-section-sub">Saisissez les informations ci-dessous pour créer la réservation et générer le pass PDF.</div>
+                <form id="reservationForm" onsubmit="event.preventDefault(); processReservation();">
+                    
+                    <!-- Date & Heure (date_reservation & heure_reservation) -->
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Date du Rendez-vous <code>date_reservation</code></label>
+                            <label class="form-label">Date du RDV <code>date_reservation</code></label>
+                            <input type="date" id="date_reservation" class="form-input" required value="2026-09-15" onchange="updateSummary()">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Heure du Rendez-vous <code>heure_reservation</code></label>
+                            <label class="form-label">Heure du RDV <code>heure_reservation</code></label>
+                            <select id="heure_reservation" class="form-select" onchange="updateSummary()">
+                                <option value="10:30">10:30</option>
+                                <option value="11:15" selected>11:15</option>
+                        <label class="form-label">Photo du Style Souhaité <code>photo_du_style</code></label>
+                        
+                        <div class="style-photo-picker" id="uploadDropZone" onclick="document.getElementById('fileInput').click();">
+                            <div style="font-size: 1.8rem; margin-bottom: 6px;">📷</div>
+                            <div style="font-weight: 700; font-size: 0.95rem;">Cliquez pour importer la photo de votre modèle / coupe</div>
+                            <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 2px;">Formats acceptés: JPG, PNG (Max 5Mo)</div>
+                            <div style="font-size: 1.6rem; margin-bottom: 4px;">📷</div>
+                            <div style="font-weight: 700; font-size: 0.9rem;">Toucher / Cliquez pour importer votre photo modèle</div>
+                            <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 2px;">Formats: JPG, PNG (Max 5Mo)</div>
+                            <input type="file" id="fileInput" accept="image/*" class="hidden" onchange="handleFileSelect(event)">
+                        </div>
+                        <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 12px; font-weight: 700;">Ou choisissez parmi nos styles de référence :</div>
+                        <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 10px; font-weight: 700;">Ou choisissez parmi nos styles de référence :</div>
+                        <div class="sample-photos-row">
+                            <div class="sample-photo-thumb selected" onclick="selectSamplePhoto('assets/barber_lookbook_gallery_1788785679953.jpg', this)">
+                                <img src="assets/barber_lookbook_gallery_1788785679953.jpg" alt="Style 1">
+                </form>
+            </main>
+            <!-- Sidebar Reçu / Pass PDF -->
+            <aside class="ticket-pass-card">
+            <!-- Sidebar Reçu / Pass PDF (Mobile Stack & Desktop Sticky) -->
+            <aside class="ticket-pass-card" id="ticketPassCard">
+                <div class="ticket-header">
+                    <span>Pass Réservation</span>
+                    <span class="ticket-code-tag" id="disp_id_res">#RES-8492</span>
+                <div class="ticket-row">
+                    <span>Date Création :</span>
+                    <strong id="disp_created" style="font-family: var(--font-mono); font-size: 0.8rem;">2026-09-14 22:18</strong>
+                    <strong id="disp_created" style="font-family: var(--font-mono); font-size: 0.78rem;">2026-09-15 13:10</strong>
+                </div>
+                <div style="font-size: 0.85rem; font-weight: 700; color: var(--text-muted); margin-top: 4px;">Photo du Style Référence (<code>photo_du_style</code>) :</div>
+                <div style="font-size: 0.8rem; font-weight: 700; color: var(--text-muted); margin-top: 2px;">Photo du Style Référence (<code>photo_du_style</code>) :</div>
+                <div class="ticket-photo-thumb">
+                    <img id="disp_photo_style" src="assets/barber_lookbook_gallery_1788785679953.jpg" alt="Aperçu photo style">
+                </div>
+                <div class="barcode-visual">
+                    <div class="barcode-lines"></div>
+                    <div style="font-family: var(--font-mono); font-size: 0.75rem; color: #333; margin-top: 4px;" id="disp_barcode">RES-8492-2026</div>
+                    <div style="font-family: var(--font-mono); font-size: 0.72rem; color: #333; margin-top: 4px;" id="disp_barcode">RES-8492-2026</div>
+                </div>
+                <div id="pdfDownloadSection" class="hidden">
+                    <div style="background: rgba(16, 185, 129, 0.15); color: var(--accent-green); border: 1px solid var(--accent-green); border-radius: var(--radius-md); padding: 12px; text-align: center; font-size: 0.85rem; font-weight: 700; margin-bottom: 10px;">
+                    <div style="background: rgba(16, 185, 129, 0.15); color: var(--accent-green); border: 1px solid var(--accent-green); border-radius: var(--radius-md); padding: 10px; text-align: center; font-size: 0.82rem; font-weight: 700; margin-bottom: 8px;">
+                        ✓ Réservation enregistrée en BDD !
+                    </div>
+                    <button class="btn-download-pdf" onclick="generateAndDownloadPDF()">
+                        📥 Télécharger le Ticket (<code>ticket_en_pdf</code>)
+                        📥 Télécharger le Ticket PDF (<code>ticket_en_pdf</code>)
+                    </button>
+                </div>
+            </aside>
+        function processReservation() {
+            const prenom = document.getElementById('prenom_client').value;
+            const nom = document.getElementById('nom_client').value;
+            const empId = document.getElementById('id_employe').value;
+            const randomCode = 'RES-' + Math.floor(1000 + Math.random() * 9000);
+            
+            generatedReservationCode = '#' + randomCode;
+            document.getElementById('disp_created').textContent = timestampStr;
+            document.getElementById('pdfDownloadSection').classList.remove('hidden');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            // Scroll to PDF Ticket Pass on mobile smoothly
+            const passCard = document.getElementById('ticketPassCard');
+            passCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+        function generateAndDownloadPDF() {
+</body>
+</html>

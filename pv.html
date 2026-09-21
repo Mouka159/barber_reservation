@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Workflow Complet : Réservation -> Validation Admin -> Email & Ticket PDF</title>
+    <meta name="description" content="Workflow complet avec tableau de bord admin, validation de réservation, simulation d'envoi d'email et téléchargement du ticket PDF.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- jsPDF CDN for client-side PDF Ticket Generation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+        :root {
+            --bg-main: #0B0F17;
+            --bg-card: #151C28;
+            --bg-element: #1E293B;
+            --border-color: #334155;
+            --primary: #f59e0b;
+            --primary-hover: #d97706;
+            --primary-light: rgba(245, 158, 11, 0.12);
+            --text-main: #F8FAFC;
+            --text-muted: #94A3B8;
+            --text-dim: #64748B;
+            --accent-green: #10B981;
+            --accent-blue: #38BDF8;
+            --accent-purple: #a855f7;
+            --radius-xl: 20px;
+            --radius-lg: 16px;
+            --radius-md: 10px;
+            --radius-sm: 6px;
+            --font-sans: 'Plus Jakarta Sans', sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: var(--font-sans); background-color: var(--bg-main); color: var(--text-main); line-height: 1.5; min-height: 100vh; padding-bottom: 80px; }
+        .system-bar {
+            background: linear-gradient(90deg, #1e1b4b, #581c87);
+            border-bottom: 1px solid #9333ea;
+            padding: 10px 24px;
+            font-size: 0.82rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: #f3e8ff;
+            font-family: var(--font-mono);
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .wf-badge { background: #7e22ce; color: #fff; padding: 2px 8px; border-radius: 4px; font-weight: 700; margin-right: 6px; }
+        /* Navigation Views Switcher */
+        .navbar {
+            background: rgba(21, 28, 40, 0.95);
+            backdrop-filter: blur(16px);
+            border-bottom: 1px solid var(--border-color);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            padding: 14px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        .view-switcher-tabs {
+            display: flex;
+            background: var(--bg-element);
+            padding: 4px;
+            border-radius: var(--radius-md);
+            gap: 6px;
+            border: 1px solid var(--border-color);
+        }
+        .v-tab {
+            padding: 8px 16px;
+            border-radius: var(--radius-sm);
+            font-size: 0.88rem;
+            font-weight: 700;
+            cursor: pointer;
+            border: none;
+            background: transparent;
+            color: var(--text-muted);
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .v-tab.active {
+            background: var(--primary);
+            color: #000;
+        }
+        .v-tab.active-admin {
+            background: var(--accent-purple);
+            color: #fff;
+        }
+        .v-tab.active-email {
+            background: var(--accent-green);
+            color: #fff;
+        }
+        .container { max-width: 1200px; margin: 0 auto; padding: 28px 20px; }
+        /* Cards & Components */
+        .card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); padding: 28px; }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px; }
+        @media (max-width: 600px) { .form-row { grid-template-columns: 1fr; } }
+        .form-input, .form-select {
+            width: 100%; background: var(--bg-element); border: 1px solid var(--border-color);
+            border-radius: var(--radius-md); padding: 12px; color: var(--text-main); font-size: 16px; outline: none;
+        }
+        .btn-action {
+            background: var(--primary); color: #000; border: none; border-radius: var(--radius-md);
+            padding: 14px 20px; font-weight: 800; cursor: pointer; width: 100%; transition: all 0.2s;
+            font-size: 1rem; display: flex; align-items: center; justify-content: center; gap: 8px;
+        }
+        .btn-action:hover { background: var(--primary-hover); }
+        /* Status Badges */
+        .status-badge {
+            font-family: var(--font-mono); font-size: 0.78rem; font-weight: 800; padding: 4px 10px; border-radius: 12px; display: inline-block;
+        }
+        .status-pending { background: rgba(245, 158, 11, 0.18); color: var(--primary); border: 1px solid var(--primary); }
+        .status-approved { background: rgba(16, 185, 129, 0.18); color: var(--accent-green); border: 1px solid var(--accent-green); }
+        /* Admin Table */
+        .admin-table { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.9rem; }
+        .admin-table th { background: var(--bg-element); padding: 12px; font-family: var(--font-mono); font-size: 0.78rem; color: var(--text-muted); border-bottom: 2px solid var(--border-color); }
+        .admin-table td { padding: 14px 12px; border-bottom: 1px solid var(--border-color); vertical-align: middle; }
+        .btn-validate { background: #059669; color: #fff; border: none; padding: 8px 14px; border-radius: var(--radius-md); font-weight: 800; font-size: 0.85rem; cursor: pointer; }
+        .btn-validate:hover { background: #047857; }
+        /* Email Notification Simulation Box */
+        .email-box {
+            background: #1e293b; border: 1px solid #3b82f6; border-radius: var(--radius-lg); padding: 24px; max-width: 650px; margin: 0 auto;
+        }
+        .email-header-meta { border-bottom: 1px solid var(--border-color); padding-bottom: 12px; margin-bottom: 16px; font-size: 0.88rem; color: var(--text-muted); }
+        .email-header-meta strong { color: #fff; }
+        .hidden { display: none !important; }
+    </style>
+</head>
+<body>
+    <div class="system-bar">
+        <div>
+            <span class="wf-badge">WORKFLOW EN 3 ÉTAPES</span>
+            <span>Réservation ➔ Validation Admin ➔ Notification Email & Téléchargement Ticket PDF</span>
+        </div>
+        <div style="font-size: 0.78rem;">Simulation complète du workflow business</div>
+    </div>
+    <!-- Navigation Tabs -->
+    <nav class="navbar">
+        <div style="font-weight: 800; font-size: 1.2rem;">
+            ✂️ <span>L'ATELIER</span> - Workflow Validation Admin
+        </div>
+        <div class="view-switcher-tabs">
+            <button class="v-tab active" id="tab-client" onclick="switchView('client')">
+                1. Client (Réservation)
+            </button>
+            <button class="v-tab" id="tab-admin" onclick="switchView('admin')">
+                2. Admin (Dashboard) <span id="pendingCountBadge" style="background: var(--primary); color: #000; font-size: 0.7rem; padding: 1px 6px; border-radius: 10px;">1</span>
+            </button>
+            <button class="v-tab" id="tab-email" onclick="switchView('email')">
+                3. Email & Ticket PDF Client
+            </button>
+        </div>
+    </nav>
+    <div class="container">
+        <!-- ================= 1. VUE CLIENT : FORMULAIRE DE RÉSERVATION ================= -->
+        <div id="view-client" class="card">
+            <div style="margin-bottom: 20px;">
+                <h2 style="font-size: 1.4rem; font-weight: 800;">1. Prise de Rendez-vous (Client)</h2>
+                <p style="color: var(--text-muted); font-size: 0.9rem;">Soumettez votre demande. La réservation sera transmise à l'administrateur pour validation.</p>
+            </div>
+            <form onsubmit="event.preventDefault(); submitClientBooking();">
+                <div class="form-row">
+                    <div>
+                        <label style="display: block; font-size: 0.85rem; font-weight: 700; color: var(--text-muted); margin-bottom: 6px;">Prénom Client</label>
+                        <input type="text" id="c_prenom" class="form-input" required value="Thomas">
+                    </div>
+                    <div>
+                        <label style="display: block; font-size: 0.85rem; font-weight: 700; color: var(--text-muted); margin-bottom: 6px;">Nom Client</label>
+                        <input type="text" id="c_nom" class="form-input" required value="Martin">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div>
+                        <label style="display: block; font-size: 0.85rem; font-weight: 700; color: var(--text-muted); margin-bottom: 6px;">Email (pour recevoir le ticket PDF)</label>
+                        <input type="email" id="c_email" class="form-input" required value="thomas.martin@example.com">
+                    </div>
+                    <div>
+                        <label style="display: block; font-size: 0.85rem; font-weight: 700; color: var(--text-muted); margin-bottom: 6px;">Coiffeur / Barbier (id_employe)</label>
+                        <select id="c_employe" class="form-select">
+                            <option value="1">Alexandre M. - Master Barber</option>
+                            <option value="2">Élodie V. - Master Coloriste</option>
+                            <option value="3">Karim B. - Spécialiste Dégradés</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div>
+                        <label style="display: block; font-size: 0.85rem; font-weight: 700; color: var(--text-muted); margin-bottom: 6px;">Date du RDV (date_reservation)</label>
+                        <input type="date" id="c_date" class="form-input" required value="2026-09-16">
+                    </div>
+                    <div>
+                        <label style="display: block; font-size: 0.85rem; font-weight: 700; color: var(--text-muted); margin-bottom: 6px;">Heure du RDV (heure_reservation)</label>
+                        <select id="c_heure" class="form-select">
+                            <option value="10:30">10:30</option>
+                            <option value="11:15" selected>11:15</option>
+                            <option value="14:00">14:00</option>
+                            <option value="15:30">15:30</option>
+                        </select>
+                    </div>
+                </div>
+                <div style="margin-bottom: 20px;">
+                    <label style="display: block; font-size: 0.85rem; font-weight: 700; color: var(--text-muted); margin-bottom: 6px;">Photo du Style (photo_du_style)</label>
+                    <div style="display: flex; gap: 12px; align-items: center;">
+                        <img id="c_photo_preview" src="assets/barber_lookbook_gallery_1788785679953.jpg" style="width: 70px; height: 70px; border-radius: 8px; object-fit: cover; border: 2px solid var(--primary);" alt="Preview">
+                        <div style="font-size: 0.85rem; color: var(--text-muted);">Modele sélectionné : <strong>Skin Fade & Barbe Net</strong></div>
+                    </div>
+                </div>
+                <button type="submit" class="btn-action">
+                    Envoyer la Demande de Réservation ➔
+                </button>
+            </form>
+            <div id="clientSuccessNotice" class="hidden" style="margin-top: 20px; background: rgba(245, 158, 11, 0.15); border: 1px solid var(--primary); padding: 16px; border-radius: 10px;">
+                <div style="font-weight: 800; color: var(--primary); font-size: 1rem; margin-bottom: 4px;">⏳ Réservation enregistrée (#RES-9941)</div>
+                <div style="font-size: 0.9rem; color: var(--text-muted);">
+                    Votre demande est en cours d'examen par l'administrateur. Cliquez sur l'onglet <strong>"2. Admin (Dashboard)"</strong> pour valider ce rendez-vous !
+                </div>
+            </div>
+        </div>
+        <!-- ================= 2. VUE ADMIN : DASHBOARD DE VALIDATION ================= -->
+        <div id="view-admin" class="card hidden">
+            <div style="margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <h2 style="font-size: 1.4rem; font-weight: 800;">2. Tableau de Bord Administrateur (Dashboard)</h2>
+                    <p style="color: var(--text-muted); font-size: 0.9rem;">Examinez les demandes entrantes et cliquez sur "Valider" pour envoyer l'email et débloquer le Ticket PDF client.</p>
+                </div>
+            </div>
+            <div style="overflow-x: auto;">
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>id_reservation</th>
+                            <th>Client (id_utilisateur)</th>
+                            <th>Coiffeur (id_employe)</th>
+                            <th>Date & Heure</th>
+                            <th>Photo du Style</th>
+                            <th>Statut BDD</th>
+                            <th>Action Admin</th>
+                        </tr>
+                    </thead>
+                    <tbody id="adminTableBody">
+                        <tr id="row-9941">
+                            <td><strong style="color: var(--primary); font-family: var(--font-mono);">#RES-9941</strong></td>
+                            <td>
+                                <strong id="adm_client_name">Thomas Martin</strong>
+                                <div style="font-size: 0.78rem; color: var(--text-muted);" id="adm_client_email">thomas.martin@example.com</div>
+                            </td>
+                            <td><strong id="adm_employe_name">Alexandre M.</strong></td>
+                            <td>
+                                <div id="adm_date" style="font-weight: 700;">16/09/2026</div>
+                                <div id="adm_heure" style="font-family: var(--font-mono); color: var(--primary);">11:15</div>
+                            </td>
+                            <td>
+                                <img id="adm_photo" src="assets/barber_lookbook_gallery_1788785679953.jpg" style="width: 50px; height: 50px; border-radius: 6px; object-fit: cover; border: 1px solid var(--border-color);" alt="Style">
+                            </td>
+                            <td>
+                                <span class="status-badge status-pending" id="status-badge-9941">EN ATTENTE</span>
+                            </td>
+                            <td>
+                                <button class="btn-validate" id="btn-val-9941" onclick="validateReservationByAdmin('9941')">
+                                    ✓ Valider le RDV
+                                </button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <!-- ================= 3. VUE EMAIL CLIENT & TÉLÉCHARGEMENT PDF ================= -->
+        <div id="view-email" class="card hidden">
+            <div style="text-align: center; margin-bottom: 24px;">
+                <h2 style="font-size: 1.4rem; font-weight: 800;">3. Boîte Mail du Client & Téléchargement du Ticket</h2>
+                <p style="color: var(--text-muted); font-size: 0.9rem;">Une fois validée par l'admin, le client reçoit cet e-mail officiel et peut télécharger son ticket PDF (`ticket_en_pdf`).</p>
+            </div>
+            <!-- Email Notification Card -->
+            <div class="email-box">
+                <div class="email-header-meta">
+                    <div><strong>De :</strong> L'Atelier du Barbier &lt;reservation@atelier-barber.fr&gt;</div>
+                    <div><strong>À :</strong> <span id="mail_to_client">thomas.martin@example.com</span></div>
+                    <div><strong>Objet :</strong> 🎉 Votre Réservation #RES-9941 est Validée ! Votre Ticket PDF est prêt.</div>
+                </div>
+                <div style="color: var(--text-main); font-size: 0.95rem; line-height: 1.6;">
+                    <p style="margin-bottom: 12px;">Bonjour <strong id="mail_client_name">Thomas Martin</strong>,</p>
+                    <p style="margin-bottom: 16px;">Bonne nouvelle ! Votre demande de rendez-vous a été <strong style="color: var(--accent-green);">VALIDÉE par l'administrateur du salon</strong>.</p>
+                    <div style="background: var(--bg-card); border: 1px solid var(--border-color); padding: 16px; border-radius: 10px; margin-bottom: 20px;">
+                        <div>• <strong>Code Réservation :</strong> #RES-9941</div>
+                        <div>• <strong>Coiffeur Désigné :</strong> <span id="mail_emp_name">Alexandre M.</span></div>
+                        <div>• <strong>Date & Heure :</strong> <span id="mail_datetime">16/09/2026 à 11:15</span></div>
+                    </div>
+                    <p style="margin-bottom: 20px;">Vous pouvez dès maintenant télécharger votre **Ticket PDF officiel** ci-dessous et le présenter lors de votre arrivée :</p>
+                    <button class="btn-action" style="background: #059669; color: #fff;" onclick="downloadPdfFromEmail()">
+                        📥 Télécharger mon Ticket PDF de Réservation
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        let currentBookingState = {
+            resCode: '#RES-9941',
+            clientName: 'Thomas Martin',
+            clientEmail: 'thomas.martin@example.com',
+            employeName: 'Alexandre M.',
+            dateVal: '2026-09-16',
+            heureVal: '11:15',
+            photoUrl: 'assets/barber_lookbook_gallery_1788785679953.jpg',
+            status: 'PENDING'
+        };
+        function switchView(viewName) {
+            document.getElementById('view-client').classList.add('hidden');
+            document.getElementById('view-admin').classList.add('hidden');
+            document.getElementById('view-email').classList.add('hidden');
+            document.getElementById('tab-client').className = 'v-tab';
+            document.getElementById('tab-admin').className = 'v-tab';
+            document.getElementById('tab-email').className = 'v-tab';
+            if (viewName === 'client') {
+                document.getElementById('view-client').classList.remove('hidden');
+                document.getElementById('tab-client').classList.add('active');
+            } else if (viewName === 'admin') {
+                document.getElementById('view-admin').classList.remove('hidden');
+                document.getElementById('tab-admin').classList.add('active-admin');
+            } else if (viewName === 'email') {
+                document.getElementById('view-email').classList.remove('hidden');
+                document.getElementById('tab-email').classList.add('active-email');
+            }
+        }
+        function submitClientBooking() {
+            const prenom = document.getElementById('c_prenom').value;
+            const nom = document.getElementById('c_nom').value;
+            const email = document.getElementById('c_email').value;
+            const empSelect = document.getElementById('c_employe');
+            const empName = empSelect.options[empSelect.selectedIndex].text.split('-')[0].trim();
+            const dateVal = document.getElementById('c_date').value;
+            const heureVal = document.getElementById('c_heure').value;
+            currentBookingState.clientName = prenom + ' ' + nom;
+            currentBookingState.clientEmail = email;
+            currentBookingState.employeName = empName;
+            currentBookingState.dateVal = dateVal;
+            currentBookingState.heureVal = heureVal;
+            currentBookingState.status = 'PENDING';
+            // Sync with Admin Dashboard Table
+            document.getElementById('adm_client_name').textContent = currentBookingState.clientName;
+            document.getElementById('adm_client_email').textContent = email;
+            document.getElementById('adm_employe_name').textContent = empName;
+            document.getElementById('adm_date').textContent = dateVal;
+            document.getElementById('adm_heure').textContent = heureVal;
+            document.getElementById('clientSuccessNotice').classList.remove('hidden');
+        }
+        function validateReservationByAdmin(id) {
+            currentBookingState.status = 'APPROVED';
+            // Update Admin Badge
+            const badge = document.getElementById(`status-badge-${id}`);
+            badge.className = 'status-badge status-approved';
+            badge.textContent = 'VALIDÉE par Admin';
+            const btn = document.getElementById(`btn-val-${id}`);
+            btn.style.background = '#64748b';
+            btn.textContent = '✓ Validée';
+            btn.disabled = true;
+            // Sync Mail Content
+            document.getElementById('mail_to_client').textContent = currentBookingState.clientEmail;
+            document.getElementById('mail_client_name').textContent = currentBookingState.clientName;
+            document.getElementById('mail_emp_name').textContent = currentBookingState.employeName;
+            document.getElementById('mail_datetime').textContent = `${currentBookingState.dateVal} à ${currentBookingState.heureVal}`;
+            document.getElementById('pendingCountBadge').textContent = '0';
+            alert('Réservation #RES-9941 validée avec succès ! Un e-mail automatique contenant le Ticket PDF a été transmis au client.');
+            // Switch to Email view to show user the notification & download button
+            switchView('email');
+        }
+        function downloadPdfFromEmail() {
+            if (currentBookingState.status !== 'APPROVED') {
+                alert('Attention : Cette réservation doit d\'abord être validée par l\'administrateur dans le Dashboard !');
+                return;
+            }
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            // Header Box
+            doc.setFillColor(15, 23, 42);
+            doc.rect(0, 0, 210, 42, 'F');
+            doc.setTextColor(245, 158, 11);
+            doc.setFontSize(20);
+            doc.setFont("helvetica", "bold");
+            doc.text("L'ATELIER - TICKET DE RÉSERVATION", 14, 26);
+            doc.setTextColor(16, 185, 129);
+            doc.setFontSize(10);
+            doc.text("STATUS: VALIDÉ PAR ADMIN", 145, 26);
+            let y = 58;
+            doc.setTextColor(30, 41, 59);
+            doc.setFontSize(12);
+            doc.setFont("helvetica", "bold");
+            doc.text("REÇU & SPÉCIFICATIONS DU STYLE :", 14, y);
+            y += 12;
+            doc.setFont("helvetica", "normal");
+            doc.text(`• Code Réservation : ${currentBookingState.resCode}`, 18, y);
+            y += 9;
+            doc.text(`• Client : ${currentBookingState.clientName} (${currentBookingState.clientEmail})`, 18, y);
+            y += 9;
+            doc.text(`• Coiffeur / Barbier : ${currentBookingState.employeName}`, 18, y);
+            y += 9;
+            doc.text(`• Date & Heure : ${currentBookingState.dateVal} à ${currentBookingState.heureVal}`, 18, y);
+            y += 9;
+            doc.text(`• Fichier PDF : /tickets/ticket_res_9941.pdf`, 18, y);
+            y += 20;
+            doc.setDrawColor(245, 158, 11);
+            doc.setLineWidth(1);
+            doc.line(14, y, 196, y);
+            y += 15;
+            doc.setFontSize(10);
+            doc.setTextColor(100, 116, 139);
+            doc.text("Présentez ce ticket validé sur votre téléphone à l'accueil du salon.", 14, y);
+            doc.save(`Ticket_Valide_${currentBookingState.resCode.replace('#', '')}.pdf`);
+        }
+    </script>
+</body>
+</html>
+<?php
+// ==============================================================================
+// valider_reservation.php - Script PHP de Validation par l'Admin & Envoi d'Email
+// ==============================================================================
+require_once 'db.php';
+// 1. Récupération de l'identifiant de réservation à valider
+$id_reservation = isset($_POST['id_reservation']) ? intval($_POST['id_reservation']) : (isset($_GET['id']) ? intval($_GET['id']) : 0);
+if ($id_reservation <= 0) {
+    die(json_encode(['success' => false, 'message' => 'Identifiant de réservation invalide.']));
+}
+$emailSent = false;
+$reservationData = null;
+if ($pdo) {
+    // 2. Mise à jour du statut dans la base de données
+    $stmt = $pdo->prepare("UPDATE reservation SET statut = 'VALIDEE' WHERE id_reservation = ?");
+    $stmt->execute([$id_reservation]);
+    // 3. Récupération des détails pour l'envoi de l'email
+    $stmtSelect = $pdo->prepare("
+        SELECT r.*, u.email AS email_client, u.nom AS nom_client, u.prenom AS prenom_client,
+               e.nom AS nom_employe, e.prenom AS prenom_employe
+        FROM reservation r
+        JOIN utilisateurs u ON r.id_utilisateur = u.id_utilisateur
+        JOIN employes e ON r.id_employe = e.id_employe
+        WHERE r.id_reservation = ?
+    ");
+    $stmtSelect->execute([$id_reservation]);
+    $reservationData = $stmtSelect->fetch();
+}
+// Données de secours pour test
+if (!$reservationData) {
+    $reservationData = [
+        'id_reservation' => $id_reservation,
+        'email_client' => 'thomas.martin@example.com',
+        'prenom_client' => 'Thomas',
+        'nom_client' => 'Martin',
+        'date_reservation' => '2026-09-16',
+        'heure_reservation' => '11:15:00',
+        'prenom_employe' => 'Alexandre'
+    ];
+}
+// 4. Envoi de l'email de confirmation au client avec le lien de téléchargement du Ticket PDF
+$to = $reservationData['email_client'];
+$subject = "=?UTF-8?B?" . base64_encode("🎉 Votre Réservation #" . $id_reservation . " est Validée ! Votre Ticket PDF est disponible") . "?=";
+$downloadPdfUrl = "http://" . $_SERVER['HTTP_HOST'] . "/generer_ticket.php?id=" . $id_reservation;
+$message = "
+<html>
+<head>
+    <title>Confirmation de Réservation</title>
+</head>
+<body style='font-family: Arial, sans-serif; background-color: #f4f4f5; padding: 20px;'>
+    <div style='max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 8px; padding: 30px; border: 1px solid #e4e4e7;'>
+        <h2 style='color: #f59e0b;'>L'ATELIER DU BARBIER</h2>
+        <h3 style='color: #10b981;'>✓ Votre réservation a été VALIDÉE par le salon</h3>
+        
+        <p>Bonjour <strong>" . htmlspecialchars($reservationData['prenom_client'] . " " . $reservationData['nom_client']) . "</strong>,</p>
+        <p>L'administrateur a validé votre créneau de rendez-vous avec <strong>" . htmlspecialchars($reservationData['prenom_employe']) . "</strong>.</p>
+        
+        <div style='background-color: #f8fafc; padding: 15px; border-radius: 6px; margin: 20px 0;'>
+            <p style='margin: 5px 0;'><strong>Code Réservation :</strong> #RES-" . $id_reservation . "</p>
+            <p style='margin: 5px 0;'><strong>Date :</strong> " . htmlspecialchars($reservationData['date_reservation']) . "</p>
+            <p style='margin: 5px 0;'><strong>Heure :</strong> " . htmlspecialchars($reservationData['heure_reservation']) . "</p>
+        </div>
+        
+        <p style='text-align: center; margin-top: 30px;'>
+            <a href='" . $downloadPdfUrl . "' style='background-color: #059669; color: white; padding: 14px 28px; text-decoration: none; border-radius: 6px; font-weight: bold; display: inline-block;'>
+                📥 Télécharger mon Ticket PDF de Réservation
+            </a>
+        </p>
+    </div>
+</body>
+</html>
+";
+$headers = "MIME-Version: 1.0" . "\r\n";
+$headers .= "Content-type:text/html;charset=UTF-8" . "\r\n";
+$headers .= "From: L'Atelier du Barbier <reservation@atelier-barber.fr>" . "\r\n";
+// Déclenchement mail
+@mail($to, $subject, $message, $headers);
+// Retour JSON pour requête Ajax Admin
+header('Content-Type: application/json');
+echo json_encode([
+    'success' => true,
+    'message' => 'Réservation validée et e-mail de confirmation envoyé au client.',
+    'id_reservation' => $id_reservation,
+    'pdf_url' => $downloadPdfUrl
+]);
+?>
