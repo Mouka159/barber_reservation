@@ -2,26 +2,24 @@
 require_once("../admis/db.php");
 
 if(isset($_POST['submit'])) {
-    $nom = trim($_POST['nom'] ?? '');
+    $nom = trim($_POST['nom_client'] ?? '');
     $email = trim($_POST['email_client'] ?? '');
     $tel = trim($_POST['tel_client'] ?? '');
-    $id_employe = (int)($_POST['id_employe'] ?? 0);
     $date_reservation = trim($_POST['date_reservation'] ?? '');
     $heure_reservation = trim($_POST['heure_reservation_time'] ?? '');
-    $photo_style = trim($_POST['photo_style'] ?? '');
+    $photo_style = trim($_FILES['photo_style']['name'] ?? '');
 
-    if ($nom === '' || $email === '' || $tel === '' || $id_employe <= 0 || $date_reservation === '' || $heure_reservation === '') {
-        http_response_code(400);
-        echo "Tous les champs sont obligatoires.";
-        exit;
+    if(empty($nom) || empty($email) || empty($tel) || empty($id_employe) || empty($date_reservation) || empty($heure_reservation)) {
+        die("Tous les champs sont obligatoires.");
     }
 
-    $sql = "INSERT INTO reservations (nom, email_client, tel_client, id_employe, date_reservation, heure_reservation, photo_style)
-            VALUES (:nom, :email_client, :tel_client, :id_employe, :date_reservation, :heure_reservation, :photo_style)";
+    $sql = "INSERT INTO reservations (nom_client,id_service, email_client, tel_client, id_employe, date_reservation, heure_reservation, photo_style)
+            VALUES (:nom_client, :id_service, :email_client, :tel_client, :id_employe, :date_reservation, :heure_reservation, :photo_style)";
 
     $stmt = $pdo->prepare($sql);
     $stmt->execute([
-        ':nom' => $nom,
+        ':nom_client' => $nom,
+        ':id_service' => $id_service,
         ':email_client' => $email,
         ':tel_client' => $tel,
         ':id_employe' => $id_employe,

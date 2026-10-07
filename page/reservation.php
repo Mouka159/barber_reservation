@@ -58,12 +58,39 @@
                 <form id="reservationForm" method="POST" action="../logique/reservation.php" onsubmit="processReservation(event)">
                     
                     <!-- Utilisateur (id_utilisateur) -->
-                    <div class="form-group">
-                        <label class="form-label">Nom Client</label>
+                    <!--div class="form-group">
+                        <label class="form-label">Pseudo</label>
                         <div class="form-row">
-                            <input type="text" id="nom" name="nom" class="form-input" placeholder="Votre nom" required>
+                           
+                        </div>
+                        <div class="form-row">
+                           <label class="form-label">service</label>
+                            
+                            </div>
+                    </div-->
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Pseudo</label>
+                             <input type="text" id="nom" name="nom_client" class="form-input" placeholder="Votre nom" required oninput="updateSummary()">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Service</label>
+                            <select id="id_service" name="id_service" class="form-input" value="selectionner votre services" required onchange="updateSummary()">
+                                <?php
+                                // Récupérer les services de la table services
+                                $sql = "SELECT id_service, nom_service FROM services";
+                                $stmt = $pdo->query($sql);
+                                // Les options de la liste déroulante
+                                while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                                    $id_serv = $row['id_service'];
+                                    $nom_serv = $row['nom_service'];
+                                    echo "<option value=\"$id_serv\">$nom_serv</option>";
+                                }
+                                ?>
+                            </select>
                         </div>
                     </div>
+                    
                     <div class="form-row">
                         <div class="form-group">
                             <label class="form-label">Email Client</label>
@@ -71,13 +98,13 @@
                         </div>
                         <div class="form-group">
                             <label class="form-label">Téléphone</label>
-                            <input type="tel" id="tel_client" name="tel_client" class="form-input" required placeholder="71769907">
+                            <input type="tel" id="tel_client" name="tel_client" class="form-input" required placeholder="71769907" oninput="updateSummary()">
                         </div>
                     </div>
                     <!-- Employé (id_employe) -->
                     <div class="form-group">
                         <label class="form-label">Coiffeur / Barbier Désigné </label>
-                        <select id="id_employe" name="id_employe" class="form-select" onchange="updateSummary()">
+                        <select id="id_employe" name="id_employe" class="form-select" placeholder="Sélectionnez un employé" onchange="updateSummary()">
                             <?php
                             //recuperer les employes de la table employes
                             $ql = "SELECT id_employe, nom_employe FROM employes";
@@ -95,7 +122,7 @@
                     <div class="form-row">
                         <div class="form-group">
                             <label class="form-label">Date du Rendez-vous </label>
-                            <input type="date" id="date_reservation" name="date_reservation" class="form-input" required value="2026-09-15" onchange="updateSummary()">
+                            <input type="date" id="date_reservation" name="date_reservation" class="form-input" required onchange="updateSummary()">
                         </div>
                         <div class="form-group">
                             <label class="form-label">Heure du Rendez-vous </label>
@@ -104,7 +131,7 @@
                     </div>
                     <!-- Photo du Style (photo_du_style) -->
                     <div class="form-group">
-                        <label class="form-label">Photo du Style Souhaité <code>photo_du_style</code></label>
+                        <label class="form-label">Photo du Style Souhaité </label>
                         
                         <div class="style-photo-picker" id="uploadDropZone" onclick="document.getElementById('fileInput').click();">
                             <div style="font-size: 1.8rem; margin-bottom: 6px;"><i class="fas fa-camera"></i></div>
@@ -121,182 +148,49 @@
                 </form>
             </main>
             <!-- Sidebar Reçu / Pass PDF -->
-            <!--aside class="ticket-pass-card">
+            <aside class="ticket-pass-card">
                 <div class="ticket-header">
                     <span>Pass Réservation</span>
                     <span class="ticket-code-tag" id="disp_id_res">#RES-8492</span>
                 </div>
                 <div class="ticket-row">
-                    <span>ID Utilisateur :</span>
-                    <strong id="disp_id_user">USR-104 (Thomas Martin)</strong>
+                    <span>pseudo_client :</span>
+                    <strong id="disp_id_user"></strong>
                 </div>
                 <div class="ticket-row">
-                    <span>ID Employé :</span>
-                    <strong id="disp_id_emp">EMP-1 (Alexandre M.)</strong>
+                    <span>Prenom emp</span>
+                    <strong id="disp_id_emp"></strong>
+                </div>
+                <div class="ticket-row">
+                    <span>Service :</span>
+                    <strong id="disp_id_service"></strong>
                 </div>
                 <div class="ticket-row">
                     <span>Date RDV :</span>
-                    <strong id="disp_date">15/09/2026</strong>
+                    <strong id="disp_date"></strong>
                 </div>
                 <div class="ticket-row">
                     <span>Heure RDV :</span>
-                    <strong id="disp_heure">11:15</strong>
+                    <strong id="disp_heure"></strong>
                 </div>
                 <div class="ticket-row">
-                    <span>Date Création :</span>
-                    <strong id="disp_created" style="font-family: var(--font-mono); font-size: 0.8rem;">2026-09-14 22:18</strong>
+                    <span>Date /heure  :</span>
+                    <strong id="disp_created" style="font-family: var(--font-mono); font-size: 0.8rem;"></strong>
                 </div>
-                <div style="font-size: 0.85rem; font-weight: 700; color: var(--text-muted); margin-top: 4px;">Photo du Style Référence (<code>photo_du_style</code>) :</div>
+                <div class="ticket-row">
+                    <span>Numéro de téléphone :</span>
+                    <strong id="disp_tel_client"></strong>
+                </div>
+                <div style="font-size: 0.85rem; font-weight: 900;  color: var(--text-muted);  margin-top: 4px;">Photo du Style Référence:</div>
                 <div class="ticket-photo-thumb">
-                    <img id="disp_photo_style" src="assets/barber_lookbook_gallery_1788785679953.jpg" alt="Aperçu photo style">
+                    <img id="disp_photo_style" src="assets/barber_lookbook_gallery_1788785679953.jpg" style="" alt="Aperçu photo style">
                 </div>
-                <div class="barcode-visual">
-                    <div class="barcode-lines"></div>
-                    <div style="font-family: var(--font-mono); font-size: 0.75rem; color: #333; margin-top: 4px;" id="disp_barcode">RES-8492-2026</div>
-                </div>
-                <div id="pdfDownloadSection" class="hidden">
-                    <div style="background: rgba(16, 185, 129, 0.15); color: var(--accent-green); border: 1px solid var(--accent-green); border-radius: var(--radius-md); padding: 12px; text-align: center; font-size: 0.85rem; font-weight: 700; margin-bottom: 10px;">
-                        ✓ Réservation enregistrée en BDD !
-                    </div>
-                    <button class="btn-download-pdf" onclick="generateAndDownloadPDF()">
-                        📥 Télécharger le Ticket (<code>ticket_en_pdf</code>)
-                    </button>
+                
+                <!--code qr-->
                 </div>
             </aside>
         </div>
     </div>
-    <script>
-        let currentPhotoUrl = 'assets/barber_lookbook_gallery_1788785679953.jpg';
-        let generatedReservationCode = '#RES-8492';
-        let generatedPdfPath = '/tickets/ticket_res_8492.pdf';
-        function handleFileSelect(event) {
-            const file = event.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    currentPhotoUrl = e.target.result;
-                    document.getElementById('disp_photo_style').src = currentPhotoUrl;
-                };
-                reader.readAsDataURL(file);
-            }
-        }
-        function selectSamplePhoto(url, thumbElement) {
-            document.querySelectorAll('.sample-photo-thumb').forEach(t => t.classList.remove('selected'));
-            thumbElement.classList.add('selected');
-            currentPhotoUrl = url;
-            document.getElementById('disp_photo_style').src = url;
-        }
-        function updateSummary() {
-            const empSelect = document.getElementById('id_employe');
-            const empName = empSelect.options[empSelect.selectedIndex].getAttribute('data-name');
-            const empId = empSelect.value;
-            const dateVal = document.getElementById('date_reservation').value;
-            const heureVal = document.getElementById('heure_reservation_time').value;
-            document.getElementById('disp_id_emp').textContent = `EMP-${empId} (${empName.split(' ')[0]})`;
-            document.getElementById('disp_date').textContent = dateVal;
-            document.getElementById('disp_heure').textContent = heureVal;
-        }
-        function processReservation(event) {
-            if (event) {
-                event.preventDefault();
-            }
-
-            const nom = document.getElementById('nom').value.trim();
-            const email = document.getElementById('email_client').value.trim();
-            const tel = document.getElementById('tel_client').value.trim();
-            const empId = document.getElementById('id_employe').value;
-            const dateVal = document.getElementById('date_reservation').value;
-            const heureVal = document.getElementById('heure_reservation_time').value;
-
-            if (!nom || !email || !tel || !dateVal || !heureVal) {
-                alert('Veuillez remplir tous les champs obligatoires.');
-                return;
-            }
-
-            const randomCode = 'RES-' + Math.floor(1000 + Math.random() * 9000);
-            generatedReservationCode = '#' + randomCode;
-            generatedPdfPath = `/tickets/ticket_${randomCode.toLowerCase()}.pdf`;
-            document.getElementById('disp_id_res').textContent = generatedReservationCode;
-            document.getElementById('disp_id_user').textContent = `USR-${Math.floor(100 + Math.random() * 900)} (${nom})`;
-            document.getElementById('disp_barcode').textContent = `${randomCode}-2026`;
-
-            const now = new Date();
-            const timestampStr = now.toISOString().replace('T', ' ').substring(0, 16);
-            document.getElementById('disp_created').textContent = timestampStr;
-            document.getElementById('pdfDownloadSection').classList.remove('hidden');
-
-            const form = document.getElementById('reservationForm');
-            const formData = new FormData(form);
-
-            fetch('../logique/reservation.php', {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => response.text())
-            .then(result => {
-                alert(result || 'Réservation enregistrée avec succès !');
-            })
-            .catch(error => {
-                console.error(error);
-                alert('Une erreur est survenue lors de l\'enregistrement de la réservation.');
-            });
-
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-        function generateAndDownloadPDF() {
-            const { jsPDF } = window.jspdf;
-            const doc = new jsPDF();
-            const resCode = document.getElementById('disp_id_res').textContent;
-            const clientName = document.getElementById('nom').value.trim();
-            const empSelect = document.getElementById('id_employe');
-            const empName = empSelect.options[empSelect.selectedIndex].getAttribute('data-name');
-            const dateVal = document.getElementById('date_reservation').value;
-            const heureVal = document.getElementById('heure_reservation_time').value;
-            const createdAt = document.getElementById('disp_created').textContent;
-            // PDF Styling
-            doc.setFillColor(11, 15, 23);
-            doc.rect(0, 0, 210, 40, 'F');
-            doc.setTextColor(245, 158, 11);
-            doc.setFontSize(20);
-            doc.setFont("helvetica", "bold");
-            doc.text("L'ATELIER - TICKET DE RÉSERVATION", 15, 25);
-            doc.setTextColor(255, 255, 255);
-            doc.setFontSize(10);
-            doc.text(`CODE : ${resCode}`, 155, 25);
-            doc.setTextColor(30, 41, 59);
-            doc.setFontSize(12);
-            let y = 55;
-            doc.setFont("helvetica", "bold");
-            doc.text("DÉTAILS ENREGISTRÉS DANS LA TABLE RESERVATION :", 15, y);
-            
-            y += 12;
-            doc.setFont("helvetica", "normal");
-            doc.text(`• ID Réservation : ${resCode}`, 20, y);
-            y += 10;
-            doc.text(`• Client (id_utilisateur) : ${clientName}`, 20, y);
-            y += 10;
-            doc.text(`• Coiffeur / Barbier (id_employe) : ${empName}`, 20, y);
-            y += 10;
-            doc.text(`• Date de réservation (date_reservation) : ${dateVal}`, 20, y);
-            y += 10;
-            doc.text(`• Heure de réservation (heure_reservation) : ${heureVal}`, 20, y);
-            y += 10;
-            doc.text(`• Photo du style (photo_du_style) : ${currentPhotoUrl}`, 20, y);
-            y += 10;
-            doc.text(`• Fichier PDF (ticket_en_pdf) : ${generatedPdfPath}`, 20, y);
-            y += 10;
-            doc.text(`• Date de création (date_de_creation) : ${createdAt}`, 20, y);
-            y += 20;
-            doc.setDrawColor(245, 158, 11);
-            doc.setLineWidth(1);
-            doc.line(15, y, 195, y);
-            y += 15;
-            doc.setFontSize(10);
-            doc.setTextColor(100, 116, 139);
-            doc.text("Présentez ce ticket lors de votre arrivée au salon (14 Rue Saint-Honoré, Paris).", 15, y);
-            // Save PDF File
-            doc.save(`Ticket_Reservation_${resCode.replace('#', '')}.pdf`);
-        }
-    </script>
+    <script src="../js/reservation.js"></script>
 </body>
 </html>
