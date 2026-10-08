@@ -55,7 +55,7 @@
             <main class="form-card">
                 <div class="form-section-title">Formulaire de Réservation</div>
                 <div class="form-section-sub">Remplissez les champs ci-dessous pour enregistrer la réservation et générer votre ticket PDF.</div>
-                <form id="reservationForm" method="POST" action="../logique/reservation.php" onsubmit="processReservation(event)">
+                <form id="reservationForm" method="POST" action="../logique/reservation.php">
                     
                     <!-- Utilisateur (id_utilisateur) -->
                     <!--div class="form-group">
@@ -71,11 +71,11 @@
                     <div class="form-row">
                         <div class="form-group">
                             <label class="form-label">Pseudo</label>
-                             <input type="text" id="nom" name="nom_client" class="form-input" placeholder="Votre nom" required oninput="updateSummary()">
+                             <input type="text" id="nom" name="nom_user" class="form-input" placeholder="Votre nom" required oninput="updateSummary()">
                         </div>
                         <div class="form-group">
                             <label class="form-label">Service</label>
-                            <select id="id_service" name="id_service" class="form-input" value="selectionner votre services" required onchange="updateSummary()">
+                            <select id="id_service" name="nom_service" class="form-input" value="selectionner votre services" required onchange="updateSummary()">
                                 <?php
                                 // Récupérer les services de la table services
                                 $sql = "SELECT id_service, nom_service FROM services";
@@ -84,7 +84,7 @@
                                 while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
                                     $id_serv = $row['id_service'];
                                     $nom_serv = $row['nom_service'];
-                                    echo "<option value=\"$id_serv\">$nom_serv</option>";
+                                    echo "<option value=\"$nom_serv\">$nom_serv</option>";
                                 }
                                 ?>
                             </select>
@@ -93,18 +93,18 @@
                     
                     <div class="form-row">
                         <div class="form-group">
-                            <label class="form-label">Email Client</label>
-                            <input type="email" id="email_client" name="email_client" class="form-input" required placeholder="moukaila@example.com">
+                            <label class="form-label">Email </label>
+                            <input type="email" id="email_user" name="email_user" class="form-input" required placeholder="moukaila@example.com">
                         </div>
                         <div class="form-group">
                             <label class="form-label">Téléphone</label>
-                            <input type="tel" id="tel_client" name="tel_client" class="form-input" required placeholder="71769907" oninput="updateSummary()">
+                            <input type="tel" id="tel_user" name="telephone" class="form-input" required placeholder="71769907" oninput="updateSummary()">
                         </div>
                     </div>
                     <!-- Employé (id_employe) -->
                     <div class="form-group">
                         <label class="form-label">Coiffeur / Barbier Désigné </label>
-                        <select id="id_employe" name="id_employe" class="form-select" placeholder="Sélectionnez un employé" onchange="updateSummary()">
+                        <select id="id_employe" name="nom_employe" class="form-select" required onchange="updateSummary()">
                             <?php
                             //recuperer les employes de la table employes
                             $ql = "SELECT id_employe, nom_employe FROM employes";
@@ -113,7 +113,7 @@
                             while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
                                 $id_emp = $row['id_employe'];
                                 $nom_emp = $row['nom_employe'];
-                                echo "<option value=\"$id_emp\" data-name=\"$nom_emp\">$nom_emp</option>";
+                                echo "<option value=\"$nom_emp\">$nom_emp</option>";
                             }
                             ?>
                         </select>
@@ -122,11 +122,11 @@
                     <div class="form-row">
                         <div class="form-group">
                             <label class="form-label">Date du Rendez-vous </label>
-                            <input type="date" id="date_reservation" name="date_reservation" class="form-input" required onchange="updateSummary()">
+                            <input type="date" id="date_reservation" name="date_rdv" class="form-input" required onchange="updateSummary()">
                         </div>
                         <div class="form-group">
                             <label class="form-label">Heure du Rendez-vous </label>
-                            <input type="time" id="heure_reservation_time" name="heure_reservation_time" class="form-input" onchange="updateSummary()" style="margin-top: 8px;">
+                            <input type="time" id="heure_reservation_time" name="heure_rdv" class="form-input" required onchange="updateSummary()" style="margin-top: 8px;">
                         </div>
                     </div>
                     <!-- Photo du Style (photo_du_style) -->
@@ -137,7 +137,7 @@
                             <div style="font-size: 1.8rem; margin-bottom: 6px;"><i class="fas fa-camera"></i></div>
                             <div style="font-weight: 700; font-size: 0.95rem;">Cliquez pour importer la photo de votre modèle / coupe</div>
                             <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 2px;">Formats acceptés: JPG, PNG (Max 5Mo)</div>
-                            <input type="file" id="fileInput" accept="image/*" class="hidden" onchange="handleFileSelect(event)">
+                            <input type="file" id="fileInput" accept="image/*" class="hidden" name="photo_style" onchange="handleFileSelect(event)">
                         </div>
                         <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 12px; font-weight: 700;">Ou choisissez parmi nos styles de référence :</div>
     

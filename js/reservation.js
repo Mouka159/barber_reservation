@@ -65,7 +65,7 @@
             document.getElementById('disp_id_emp').textContent = `EMP-${empId} (${empName.split(' ')[0]})`;
             document.getElementById('disp_date').textContent = dateVal;
             document.getElementById('disp_heure').textContent = heureVal;
-            document.getElementById('disp_tel_client').textContent = document.getElementById('tel_client').value.trim();
+            document.getElementById('disp_tel_client').textContent = document.getElementById('tel_user').value.trim();
             document.getElementById('disp_id_service').textContent = serviceSelect.options[serviceSelect.selectedIndex].text;
             document.getElementById('disp_photo_style').alt = 'Photo du Style Souhaité';
         }

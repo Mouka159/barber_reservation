@@ -22,6 +22,10 @@
                     <input type="email" id="email" name="email" placeholder="moukaila@gmail.com" required>
                 </div>
                 <div class="form-group">
+                    <label for="telephone">Téléphone</label>
+                    <input type="tel" id="telephone" name="telephone" placeholder="71769907" required>
+                </div>
+                <div class="form-group">
                     <label for="password">Mot de passe</label>
                     <input type="password" id="password" name="mdp" placeholder="********" required>
                 </div>

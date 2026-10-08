@@ -5,6 +5,7 @@ require_once  "../admis/db.php";
 if (isset($_POST['envoyer'])) {
     $username = $_POST['username'];
     $email = $_POST['email'];
+    $telephone = $_POST['telephone'];
      $password = $_POST['mdp'];
 
     // Vérifier si l'email existe déjà
@@ -20,11 +21,12 @@ if (isset($_POST['envoyer'])) {
         $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
 
         // Insertion des données
-      $sql = "INSERT INTO utilisateurs (nom_user, email_user, mot_de_passe) VALUES (:nom, :email, :mot_de_passe)";
+      $sql = "INSERT INTO utilisateurs (nom_user, email_user,telephone, mot_de_passe) VALUES (:nom, :email,:telephone, :mot_de_passe)";
      $smt = $pdo->prepare($sql);
   $smt->execute([
     'nom_user' => $username,
     'email_user' => $email,
+    'telephone' => $telephone,
     'mot_de_passe' => $hashedPassword
 ]);
         $message = "Inscription réussie";
