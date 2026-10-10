@@ -1,3 +1,17 @@
+<?php
+session_start();
+
+$confirmation = $_SESSION['reservation_confirmation'] ?? null;
+unset($_SESSION['reservation_confirmation']);
+
+if ($confirmation === null) {
+    header("Location: reservation.php");
+    exit();
+}
+
+$nom_user = $confirmation['nom_user'];
+$date_reservation = $confirmation['date_reservation'];
+?>
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -39,11 +53,15 @@
 </head>
 <body>
   <div class="success-box">
-    <img src="../img/logo.png" alt="Success" width="50" height="50">
-    <h1>Bonjour<?= htmlspecialchars($nom_client); ?></h1>
-    <p>Merci d’avoir réservé chez nous. Votre demande a bien été enregistrée.</p>
-     <?= htmlspecialchars($date_reservation); ?> est confirmée.</p>
-    <a href="acceuil.php" class="btn">Retour à l’accueil</a>
-  </div> 
+    <img src="../img/logo.png" alt="Success" width="120" height="99" style="margin-left: -20px;">
+    <div class="confirmation">
+      <span>Barber & Coiffeuse</span>
+          <h1>Bonjour <?= htmlspecialchars($nom_user, ENT_QUOTES, 'UTF-8'); ?></h1>
+          <p>Merci d’avoir réservé chez nous. Votre demande a bien été enregistrée.</p>
+          <p>Votre réservation du <?= htmlspecialchars($date_reservation, ENT_QUOTES, 'UTF-8'); ?> à <?= htmlspecialchars($heure_reservation, ENT_QUOTES, 'UTF-8'); ?> est confirmée.</p>
+         <p>📧 Veuillez vérifier votre email : vous y trouverez les détails de la réservation ainsi que votre ticket.</p>
+         <a href="acceuil.php" class="btn">Retour à l’accueil</a>
+  </div>
+  </div>
 </body>
 </html>

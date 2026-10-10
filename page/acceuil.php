@@ -27,7 +27,7 @@
                <li><a href="#Apropos"><i class="fas fa-info-circle"></i>À propos</a></li>
                 <li><a href="#services"><i class="fas fa-cut"></i>Services</a></li>
                 <li><a href="#Galerie"><i class="fas fa-images"></i>Galerie</a></li>
-                <li><a href="formResev.html"><i class="fas fa-calendar-alt"></i>Reservation</a></li>
+                <li><a href="reservation.php"><i class="fas fa-calendar-alt"></i>Reservation</a></li>
                <li><a href="connexion.php"><i class="fas fa-sign-in-alt"></i>Connexion</a></li>
             </ul>
          </nav>

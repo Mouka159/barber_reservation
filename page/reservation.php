@@ -55,7 +55,7 @@
             <main class="form-card">
                 <div class="form-section-title">Formulaire de Réservation</div>
                 <div class="form-section-sub">Remplissez les champs ci-dessous pour enregistrer la réservation et générer votre ticket PDF.</div>
-                <form id="reservationForm" method="POST" action="../logique/reservation.php">
+                <form id="reservationForm" method="POST" action="../logique/reservation.php" enctype="multipart/form-data">
                     
                     <!-- Utilisateur (id_utilisateur) -->
                     <!--div class="form-group">
@@ -154,7 +154,7 @@
                     <span class="ticket-code-tag" id="disp_id_res">#RES-8492</span>
                 </div>
                 <div class="ticket-row">
-                    <span>pseudo_client :</span>
+                    <span>pseudo :</span>
                     <strong id="disp_id_user"></strong>
                 </div>
                 <div class="ticket-row">
