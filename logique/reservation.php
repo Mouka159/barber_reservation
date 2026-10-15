@@ -46,6 +46,7 @@ if (isset($_POST['submit'])) {
     $sql = "INSERT INTO reservation
             (nom_user, nom_service, email_user, telephone, nom_employe, date_rdv, heure_rdv, photo_style)
             VALUES (:nom_user, :nom_service, :email_user, :telephone, :nom_employe, :date_reservation, :heure_reservation, :photo_style)";
+            $id_reservation = $pdo->lastInsertId();
 
     try {
         $stmt = $pdo->prepare($sql);

@@ -8,9 +8,7 @@
 </head>
 <body>
     <div class="codeqr" >
-        <h2>Votre QR Code</h2>
-         <p>Scannez ce code pour accéder à votre ticket :</p>
-        <img src="../img/qrcode_20261013.png" alt="QR Code">
+        <img src="../img/qrcode_<?= date('Ymd') ?>.svg" alt="QR Code">
     </div>
      
      
